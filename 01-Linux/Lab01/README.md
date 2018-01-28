@@ -44,8 +44,9 @@ Question to be answered:
    ```
     # Size of the uncompress dataset
     du -sh ~/Chaos_Donkey/Lab01/BSR
-    # Output: 73M	/home/vision/Chaos_Donkey/Lab01/BSR
-
+    ```
+    Output: 73M	/home/vision/Chaos_Donkey/Lab01/BSR
+    ```
     # Count the number of images in BSR/BSDS500/data/images with extention .jpg   
     find ~/Chaos_Donkey/Lab01/BSR/BSDS500/data/images -name "*.jpg" -exec identify {} \; | wc -l
     ```
@@ -62,12 +63,13 @@ Question to be answered:
     for im in ${images[*]}
     do
         # print the properties of each image. For greater detail you can add -verbose before the image. 
-        # FROM: https://www.imagemagick.org/script/identify.ph
+        
         identify $im
     done
     ```
     The resolution of all images is: 321*481 = 154401, in both orientations (landscape: 481X321  and portrait: 321X481 )
-
+    FROM: https://www.imagemagick.org/script/identify.ph
+    
 9. How many of them are in landscape orientation (opposed to portrait)?
     ```
     find ~/Chaos_Donkey/Lab01/BSR/BSDS500/data/images -name "*.jpg" -exec identify {} \; | grep -i 481X321 | wc -l
