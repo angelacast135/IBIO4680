@@ -67,26 +67,27 @@ Question to be answered:
         identify $im
     done
     ```
-    The resolution of all images is: 321*481 = 154401, in both orientations (landscape: 481X321  and portrait: 321X481 )
+    The resolution of all images is: 321*481 = 154401, in both orientations (landscape: 481x321  and portrait: 321x481 )
     FROM: https://www.imagemagick.org/script/identify.ph
     
 9. How many of them are in landscape orientation (opposed to portrait)?
     ```
     find ~/Chaos_Donkey/Lab01/BSR/BSDS500/data/images -name "*.jpg" -exec identify {} \; | grep -i 481X321 | wc -l
     ```
-    Output: 348 landscape images (Size = 481X321)
+    Output: 348 landscape images (Size = 481x321)
 
 10. Crop all images to make them square (256x256). Tip: do not forget about imagemagick.
     ```
     # Move to dataset directory
     cd ~/Chaos_Donkey/Lab01/BSR/BSDS500/data/images
 
-    # find all files whose name end in .tif
+    # find all files whose name end in .jpg
     images=$(find . -name *.jpg)
 
     #iterate over them
     for im in ${images[*]}
     do
+        # crop the image centered. Work for both landscape and portrait images.
         convert $im -gravity center -crop 260x260+0+0 $im 
     done
     ```
