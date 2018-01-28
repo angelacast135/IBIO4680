@@ -88,7 +88,7 @@ Question to be answered:
     for im in ${images[*]}
     do
         # crop the image centered. Work for both landscape and portrait images.
-        convert $im -gravity center -crop 260x260+0+0 $im 
+        convert $im -gravity center -crop 256x256+0+0 $im 
     done
     ```
     FROM: https://www.imagemagick.org/discourse-server/viewtopic.php?t=13793
