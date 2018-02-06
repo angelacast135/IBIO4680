@@ -15,8 +15,10 @@ Question to be answered:
 
 4. What command will produce a table of Users and Shells sorted by shell (tip: using cut and sort)
     Using the command who to show every login session on the machine
+'''
     # Cut the output from who command delimmited by ' ' (space) and shows the 1 and 14 field (user and Shell), and sort nuumerically (-g).
     who | cut -d ' ' -f1,14 | sort -g
+'''
     FROM: https://www.computerhope.com/unix/ucut.htm
           https://www.computerhope.com/unix/usort.htm
 
