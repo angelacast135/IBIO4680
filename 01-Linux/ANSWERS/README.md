@@ -25,19 +25,19 @@ Question to be answered:
 
 5. Create a script for finding duplicate images based on their content (tip: hash or checksum) You may look in the internet for ideas, Do not forget to include the source of any code you use.
     ```
-#!/bin/bash
+    #!/bin/bash
 
-# go to Home directory
-cd ~/Chaos_Donkey/Lab01 
+    # go to Home directory
+    cd ~/Chaos_Donkey/Lab01 
 
-# remove the previous .txt created
-rm duplicated_images.txt 2>/dev/null
+    # remove the previous .txt created
+    rm duplicated_images.txt 2>/dev/null
 
-# the following command finds the duplicated images in the folder Lab1 and saves the result in duplicated_images.txt. 
-# the fisrt part of the code finds the not empty files and sorts them. Then it takes only the duplicated found files. First, the size is compared to finally compare the hash of the duplicated images in the current folder.
-find -not -empty -type f -printf "%s\n" | sort -rn | uniq -d | xargs -I{} -n1 find -type f -size {}c -print0 | xargs -0 md5sum | sort | uniq -w32 --all-repeated=separate > duplicated_images.txt
+    # the following command finds the duplicated images in the folder Lab1 and saves the result in duplicated_images.txt. 
+    # the fisrt part of the code finds the not empty files and sorts them. Then it takes only the duplicated found files. First, the size is compared to finally compare the hash of the duplicated images in the current folder.
+    find -not -empty -type f -printf "%s\n" | sort -rn | uniq -d | xargs -I{} -n1 find -type f -size {}c -print0 | xargs -0 md5sum | sort | uniq -w32 --all-repeated=separate > duplicated_images.txt
 
-chmod u+x duplicated_images.txt
+    chmod u+x duplicated_images.txt
     ```
 
     FROM: http://www.commandlinefu.com/commands/view/3555/find-duplicate-files-based-on-size-first-then-md5-hash
