@@ -67,7 +67,7 @@ Question to be answered:
 8. What is their resolution, what is their format?
    The format of the images is jpg.
     ```   
-   # find all files whose name end in .tif
+   # find all files whose name end in .jpg
    images=$(find ~/Chaos_Donkey/Lab01/BSR/BSDS500/data/images -name *.jpg)
 
     #iterate over them
