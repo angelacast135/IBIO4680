@@ -45,23 +45,20 @@ train_images = read_images(dataPath+'/images/train')
 # list with .mat name files.
 train_gt = read_images(dataPath+'/groundTruth/train')
 
-# N number of images that will be loaded, assume that can plot from 7 to 12 images for descent visualization
-N = random.randint(7, 12) 
-print()
+# N number of images that will be loaded, assume that can plot from 7 to 10 images for descent visualization
+N = random.randint(7, 10) 
 print('Number of images to plot: {}'.format(N))
-print('Number of images in train:  {}'.format(len(train_images)))
+print('Number of images in train:  {}'.format(len(train_images)-1))
 
 
-images_idx = np.random.randint(len(train_images),size=N)
+images_idx = np.random.randint(len(train_images)-1,size=N)
 images_idx.sort()
-print(images_idx)
 
 #preallocation for computational time
 ims = np.uint8(np.empty((256, 256,3,N)))
 segmentation_gt = np.empty((256, 256,N))
 boundary_gt = np.empty((256, 256,N))
 
-print('class of images_idx: {}'.format(type(images_idx) ))
 
 
 def read_groundtruth(mat_file_name,resized_size):
@@ -84,7 +81,6 @@ def read_groundtruth(mat_file_name,resized_size):
     return segm, bound
 
 for ix, i in enumerate(images_idx):
-    print('Printing i-th: {}'.format(i))
     
     # append the images in a tensor 4 dimension correspond to each image. 
     #ims(ix) = np.append( ims , [img] , axis=0)
