@@ -10,10 +10,7 @@ import pickle
 import matplotlib.pyplot as plt
 # OpenCV packages
 # normal installation routine
-try:
-    import cv2        
-except ImportError:
-   panic()
+
 
 import cv2
 # for reading .mat files
