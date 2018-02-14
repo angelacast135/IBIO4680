@@ -115,7 +115,7 @@ def show_images(images , boundary , segmentation, cols ):
 
         img = np.uint8(np.squeeze( boundary[:,:,:,n] ))
         fig = plt.subplot(3,cols, n+2*cols+1)
-        fig = plt.imshow(img , cmap = 'gray')
+        fig = plt.imshow(~img , cmap = 'gray')
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
 
