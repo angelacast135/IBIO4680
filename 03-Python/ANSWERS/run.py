@@ -1,79 +1,150 @@
-#!/usr/bin/env python
-from pathlib import Path
+#!/usr/bin/env python3
+
 import os
-cwd = os.getcwd()
-
-import tarfile
-
-my_file = Path(cwd+'/BSR/BSDS500/data/images/test/2018.jpg')
-if my_file.exists():
-	print "The file is already downloaded"
-else:
-	import os
-	print "The file is been downloaded"
-	os.system('wget http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/BSR/BSR_bsds500.tgz')
-	extracted_to_path = cwd+'/BSR_bsds500.tgz'
-	tar = tarfile.open(extracted_to_path)
-	tar.extractall()
-	tar.close()
-
 import time
-start_time=time.time()
+import numpy as np
+import random
+import pickle
 
+# matplotlib inline
+import matplotlib.pyplot as plt
+# OpenCV packages
+# normal installation routine
+try:
+    import cv2        
+except ImportError:
+   panic()
+
+import cv2
+# for reading .mat files
 import scipy.io as spio
 
-my_dir = cwd+'/BSR/BSDS500/data/images/test/'
-my_dir_grtr = cwd+'/BSR/BSDS500/data/groundTruth/test/'
-num_files = len([name for name in os.listdir(my_dir) if os.path.isfile(os.path.join(my_dir, name))])
-import random
 
-try:
-	os.makedirs(cwd+'/resize/')
-except OSError:
-	if not os.path.isdir(cwd+'/resize/'):
-		raise
+# Downlaod BSDS500 image segmentation dataset from Computer Vision - Berkley group, decompress it and remove .tgz file.
+tic1 = time.clock()
+if not os.path.isdir("./BSR"):
+    print('Connecting and downloading BSR dataset...')
+    os.system('wget http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/BSR/BSR_bsds500.tgz')
+    os.system('tar -zxvf BSR_bsds500.tgz')
+    os.system('rm BSR_bsds500.tgz')
+else:
+    tic2 = time.clock()
+    print('BSDS500 dataset is already downloaded')
 
-from PIL import Image
-import numpy
-new_dir = cwd+'/resize/'
-import matplotlib.pyplot as plt
+# cre el path con el directorio para guardar las nuevas imagenes 
+if not os.path.isdir("./resized_images"):
+    os.system('mkdir ./resized_images')
+else :
+    os.system('rm -r ./resized_images')
+
+dataPath = './BSR/BSDS500/data'
+
+def read_images(path_to_images):
+  im_list = os.listdir(path_to_images)
+  return im_list
+
+# list with .jpg name files. For reaning any other subset images change .../train to .../test or .../validation
+train_images = read_images(dataPath+'/images/train')
+# list with .mat name files.
+train_gt = read_images(dataPath+'/groundTruth/train')
+
+# N number of images that will be loaded, assume that can plot from 7 to 12 images for descent visualization
+N = random.randint(7, 12) 
+print()
+print('Number of images to plot: {}'.format(N))
+print('Number of images in train:  {}'.format(len(train_images)))
 
 
-list_files = [name for name in os.listdir(my_dir) if os.path.isfile(os.path.join(my_dir, name))]
-# list_gt = [name for name in os.listdir(my_dir_grtr) if os.path.isfile(os.path.join(my_dir_grtr, name))]
+images_idx = np.random.randint(len(train_images),size=N)
+images_idx.sort()
+print(images_idx)
 
-big_struct = []
+#preallocation for computational time
+ims = np.uint8(np.empty((256, 256,3,N)))
+segmentation_gt = np.empty((256, 256,N))
+boundary_gt = np.empty((256, 256,N))
 
-for k in range(0, 4):
-	# IMAGES
-	random_index = random.randrange(0,num_files)
-	imageFile = my_dir+list_files[random_index]
-	im1 = Image.open(imageFile)
-	width = 256
-	height = 256
-	im2 = im1.resize((width, height), Image.BILINEAR) 
-	im2.save(new_dir + list_files[random_index])
-	# File
-	myfile=list_files[random_index]
-	name_file=myfile[0:len(list_files[random_index])-4]
-	# GROUNDTRUTH
-	gtFile = my_dir_grtr+name_file+'.mat'
-	mat = spio.loadmat(gtFile, squeeze_me=True)
-	M = mat['groundTruth']
-	segg = M[0]['Segmentation'][()][:,:]
-	bounn = M[0]['Boundaries'][()][:,:]
-	big_struct = big_struct+[im1,segg,bounn]
+print('class of images_idx: {}'.format(type(images_idx) ))
 
-import pickle 
-with open('objs.pkl', 'w') as f:
-	pickle.dump([big_struct], f)
 
-plt.figure(1)
-for k in range(1, 13):
-	img=big_struct[k-1]
-	plt.subplot(4, 3, k)
-	plt.imshow(img)
+def read_groundtruth(mat_file_name,resized_size):
+    a = spio.loadmat(dataPath+'/groundTruth/train/'+mat_file_name)['groundTruth']
 
-final_time = time.time() - start_time
-print "Total processing time is %d seconds" % (final_time)
-plt.show()
+
+    segm = a[0,[0]][0]['Segmentation'][0,0]
+    bound = a[0,[0]][0]['Boundaries'][0,0]
+
+
+    for i in range(1 , a.shape[1]):
+        segm = segm + a[0,[i]][0]['Segmentation'][0,0]
+        bound = bound + a[0,[i]][0]['Boundaries'][0,0]
+    segm = np.uint8(segm)
+    bound = np.uint8(bound)
+
+    segm = cv2.resize(segm , resized_size,interpolation = cv2.INTER_CUBIC)
+    #interpolation for preserving better connected boundaries
+    bound = cv2.resize(bound , resized_size,interpolation = cv2.INTER_CUBIC)
+    return segm, bound
+
+for ix, i in enumerate(images_idx):
+    print('Printing i-th: {}'.format(i))
+    
+    # append the images in a tensor 4 dimension correspond to each image. 
+    #ims(ix) = np.append( ims , [img] , axis=0)
+    ims[:,:,:,ix] =cv2.resize( cv2.imread(dataPath+'/images/train/'+train_images[i],1), (256,256),interpolation = cv2.INTER_CUBIC)
+
+    cv2.imwrite('./resized_images/'+train_images[i],np.squeeze(ims[:,:,:,ix]))
+
+
+
+    # save segmentation and boundaries in segmentation_gt and boundary_gt respectively with all the annotations (from every annotator)
+    segmentation_gt[:,:,ix] , boundary_gt[:,:,ix] = read_groundtruth(train_gt[i],(256,256))
+
+#print('Size of Original Images {}, Sementation {} and Boundaries {}'.format(ims.shape,segmentation_gt.shape,boundary_gt.shape))
+    
+
+def show_images(images , boundary , segmentation, cols ):
+  
+    fig=plt.figure()
+    for n in range(0,cols):
+        img = np.uint8(np.squeeze( images[:,:,:,n] ))
+
+        fig=plt.subplot(3,cols,  n+1)
+        fig=plt.imshow(img[:,:,[2,1,0]])
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+
+        img = np.uint8(np.squeeze( segmentation[:,:,:,n] ))
+        fig =plt.subplot(3,cols,  n+cols+1)
+        fig =plt.imshow(img, cmap = 'gray')
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+
+        img = np.uint8(np.squeeze( boundary[:,:,:,n] ))
+        fig = plt.subplot(3,cols, n+2*cols+1)
+        fig = plt.imshow(img , cmap = 'gray')
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+
+    print('Showing images')
+    fig=plt.show()
+
+segmentation_gt = np.expand_dims(segmentation_gt , axis=2)
+boundary_gt = np.expand_dims(boundary_gt , axis=2)
+
+data_dict = {'Images': ims, 'Segmentation': segmentation_gt, 'Boundaries': boundary_gt}
+with open('./data_dict.pickle', 'wb') as handle:
+    pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+toc = time.clock()
+show_images(ims , boundary_gt , segmentation_gt , N)
+
+
+
+print('Elapsep time downloading dataset: {}; Elapsep time without downloading dataset: {}'.format(toc-tic1,toc-tic2))
+
+
+
+
+
+
