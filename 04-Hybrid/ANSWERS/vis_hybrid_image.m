@@ -20,3 +20,5 @@ for i = 2:scales
     tmp = cat(1,ones(original_height - size(cur_image,1), size(cur_image,2), num_colors), cur_image);
     output = cat(2, output, tmp);    
 end
+
+%code by James Hays
