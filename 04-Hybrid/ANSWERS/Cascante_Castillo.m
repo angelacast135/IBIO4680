@@ -12,15 +12,15 @@ ims = zeros(256,256,3,length(fils));
 ims_lp = zeros(256,256,3,length(fils));
 ims_hp = zeros(256,256,3,length(fils));
 
-ims_hyb = zeros(256,256,3,length(fils),10);
+ims_hyb = zeros(256,256,3,length(fils),length(fils));
 
 % cut frequency of LP filter
-fc1 = 0.2;
+fc1 = 1;
 % cut frequency of HP filter
-fc2 =  1;
+fc2 =  9;
 
-ker1 = fspecial('gaussian',[19,19],1);
-ker2 = fspecial('gaussian',[21,21],9);
+ker1 = fspecial('gaussian',[19,19],fc1);
+ker2 = fspecial('gaussian',[21,21],fc2);
 
 for i=1:length(fils)
     ims(:,:,:,i)=imresize((imread( fullfile('./data',fils(i).name))),[256,256]);
