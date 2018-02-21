@@ -12,15 +12,15 @@ This lab is based on:
 
 Notice how the folowing images look different when viewed from far (or zoomed out), than when looking at close range (or zoomed in).
 
-![Dolphin - Car](DolphinCarHybrid.jpg)
+![Dolphin - Car](imgs/DolphinCarHybrid.jpg)
 
-![Jaguar - Tiger](JaguarTigerHybrid.jpg)
+![Jaguar - Tiger](imgs/JaguarTigerHybrid.jpg)
 
 Another example from two pictures:
 
-![Obama - Trump](Obama.png)
-![Obama - Trump](Trump.png)
-![Obama - Trump](ObamaTrump.png)
+![Obama - Trump](imgs/Obama.png)
+![Obama - Trump](imgs/Trump.png)
+![Obama - Trump](imgs/ObamaTrump.png)
 
 ## Short Introduction
 
@@ -55,10 +55,39 @@ Where *L* is a low pass filter, and *X1* and *X2* are the input images. Notice t
 
 In order to approximate how the image would look from different distances we can use a pyramid (see figure at the bottom of http://cs.brown.edu/courses/cs143/proj1/ ).
 
+### Creating a blended image
+
+In this section you need to play with the Gaussian Pyramid as well as the Laplacian Pyramid.
+ - **Gaussian Pyramid**: Apply Gaussian filter over image, then downsample it by a factor of 2. 
+
+     Pseudocode: 
+
+	`pyramid_down = downsampling(gauss_filter(image), factor=2)`
+
+	`pyramid_up = upsampling(gauss_filter(image), factor=2)`
+
+ - **Laplacian Pyramid**: A level in Laplacian Pyramid is formed by the difference between that level in Gaussian Pyramid and expanded version of its upper level in Gaussian Pyramid. 
+
+     Psudocode: 
+
+	`Subtract(image, pyramid_up(pyramid_down(image)))` 
+
+     _((Watch out how negative values are handled))_
+
+In order to create a blended image:
+  1. Merge (concatenate halves) the two images in a low resolution pyramid.
+  2. Gaussian Pyramid up.
+  3. Add the corresponding Laplacian Pyramid.
+  4. Repeat 2-3 until reach optimal size. 
+
+**Without/with pyramid blending:**
+
+![Obama - Trump - Direct](imgs/ObamaTrump_Direct_blending.jpg)
+![Obama - Trump - Blended](imgs/ObamaTrump_Pyramid_blending.jpg)
 
 ## Your Turn
 
-Create a hybrid image based on images from *your own* collections. Some ideas are
+Create a hybrid image based on images from *your own* collection. Some ideas are
 
 - You or people you know.
 - Pets (Your teacher's personal favorites).
@@ -73,17 +102,19 @@ Remember that you will have to *align and probably crop* the images to get a bet
 
 Include in your report the following information:
 
-- The original images
-- A short description of each image (no more than one paragraph each)
+- The original images.
+- A short description of each image (no more than one paragraph each).
 - A description of the modifications made to the original images (crops, scaling, color modifications, etc). Along with the output of this process. 
-- If you had to capture new images just for this lab, please describe if you took any special measure
-- The final hybrid image 
-- The pyramid (use 4 scales at least)
-- Code snippets where you explain only  the most important aspects of the code you developed
+- If you had to capture new images just for this lab, please describe if you took any special measure.
+- The final hybrid image.
+- The pyramid (use 4 scales at least).
+- The pyramid blending.
+- Code snippets where you explain only the most important aspects of the code you developed.
+
 
 The report should have max 4 pages, use the first two for the heading and the sections: abstract (optional), introduction, materials and methods, results, conclusions and references. Use the final 2 pages **only** for images and code snippets (that is, if you need them).
 
-Finally, do not forget to upload the report to your github repository, along with the full code you used 
+Finally, do not forget to upload the report to your github repository, along with the full code you used.
 
 
 ### Deadline
