@@ -145,7 +145,7 @@ for k in enumerate(kk):
     print("About to do KNN")
 
     from sklearn.neighbors import KNeighborsClassifier
-    neigh = KNeighborsClassifier(n_neighbors=3)
+    neigh = KNeighborsClassifier(weights='distance')
     neigh.fit(hist_train, labs_train) 
     predict_imgs_KNN=neigh.predict(hist_test)
 
@@ -153,7 +153,7 @@ for k in enumerate(kk):
     print("About to do RF")
 
     from sklearn.ensemble import RandomForestClassifier
-    clf = RandomForestClassifier(max_depth=2, random_state=0)
+    clf = RandomForestClassifier(n_estimators=15, random_state=0)
     clf.fit(hist_train, labs_train) 
     predict_imgs_RF=clf.predict(hist_test)
     

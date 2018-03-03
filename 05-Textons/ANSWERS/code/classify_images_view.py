@@ -25,8 +25,6 @@ print("Data loaded")
 from skimage import color
 from skimage import io
 
-#Set number of clusters
-k_c = 25
 
 ACA_KNN=[]
 ACA_RF=[]
@@ -107,10 +105,3 @@ for k in enumerate(kk):
     plt.savefig('./cm_1/cm_RF'+str(k[1])+'.eps', format='eps')
 
 
-# f = open("ACA_KNN", "w")
-# f.write("\n".join(map(lambda x: str(x), ACA_KNN)) + "\n")
-# f.close()
-
-# f2 = open("ACA_RF", "w")
-# f2.write("\n".join(map(lambda x: str(x), ACA_RF)) + "\n")
-# f2.close()
