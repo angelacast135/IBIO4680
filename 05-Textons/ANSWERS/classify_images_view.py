@@ -31,7 +31,7 @@ k_c = 25
 ACA_KNN=[]
 ACA_RF=[]
 
-kk = [ 60] #,80] # , 100]
+kk = [ 25, 40,60,80]
 for k in enumerate(kk):
     im_train_4labs  = data['Train_Images']
     amount_classes_tr=im_train_4labs[0,0,0,:,0].shape

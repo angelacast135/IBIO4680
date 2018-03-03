@@ -46,7 +46,7 @@ from fbRun import fbRun
 ACA_KNN=[]
 ACA_RF=[]
 
-kk = [25 , 40 , 60 , 80 , 100]
+kk = [25 , 40 , 60 , 80 ]
 for k in enumerate(kk):
     maps_textons = pickle.load( open( './textons_k/maps_textons'+str(k[1])+'.pickle', "rb" ) )
 
