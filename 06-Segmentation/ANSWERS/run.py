@@ -122,10 +122,13 @@ def hierarchical_segmentation(im, n_clusters):
     #now normalize image for posing th problem, this scale transform x\in R^n \mu_x=0, std_x=1 
     im_vector = preprocessing.scale(im_vector)
     
-    
-    connectivity = grid_to_graph(*im_vector.shape)
-    ward = AgglomerativeClustering(n_clusters=n_clusters)
-    seg_img = ward.fit(im_vector)
+    #X = np.reshape(im_vector, (-1, 1))
+
+    #connectivity = grid_to_graph(*im_vector.shape)
+    ward = AgglomerativeClustering(n_clusters=n_clusters) #connectivity=connectivity,
+
+    seg_img = ward.fit_predict(im_vector)
+
     im_segmented = np.reshape(seg_img , (im_size[0],im_size[1]) )
 
 
@@ -144,7 +147,7 @@ def watershed_segmentation(im, n_clusters):
     markers = ndi.label(local_maxi)[0]
     labels = watershed(-im, markers, mask=im)
 
-    return labels
+
 
 def add_position_feature(image):
     im_size = image.shape
@@ -175,8 +178,7 @@ def segmentByClustering( rgbImage, featureSpace, clusteringMethod, numberOfClust
         im_feat = color.rgb2hsv(rgbImage)
 
     elif featureSpace == 'rgb+xy':
-        im = rgbImage
-        im_feat = add_position_feature(im)
+        im_feat = add_position_feature(rgbImage)
 
     elif featureSpace == 'lab+xy':
         im = color.rgb2lab(rgbImage)
@@ -207,7 +209,8 @@ def segmentByClustering( rgbImage, featureSpace, clusteringMethod, numberOfClust
         im_segmented = hierarchical_segmentation(im_feat,numberOfClusters)
 
     elif clusteringMethod == 'watershed':
-        im_segmented = watershed_segmentation(im_feat,numberOfClusters)
+        im_segmented= watershed_segmentation(im_feat, numberOfClusters)
+
     
     else:
         #by default assume kmeans is used
@@ -230,7 +233,7 @@ else:
 
 
 featureSpaces =   [ 'rgb','lab' 'hsv', 'rgb+xy', 'lab+xy', 'hsv+xy']
-clusteringMethods = ['kmeans','gmm','hierarchical']
+clusteringMethods = ['kmeans','gmm','watershed','hierarchical']
 
 for ff , clusteringMethod in enumerate(clusteringMethods):
     for cc, featureSpace in enumerate(featureSpaces):
@@ -249,24 +252,28 @@ for ff , clusteringMethod in enumerate(clusteringMethods):
 
             
 
-            eval_seg = {"Im_segmented": im, "Segmentation_GT": seg}
 
             im_seg , clusteringMethod, featureSpace = segmentByClustering( np.double(im), featureSpace, clusteringMethod , numberOfClusters)
 
-            fig1=plt.subplot(1,2,1)
-            fig1=plt.imshow(np.squeeze(seg), cmap=plt.get_cmap('summer'))
-            fig1.axes.get_xaxis().set_visible(False)
-            fig1.axes.get_yaxis().set_visible(False)
+            eval_seg = {"Image": im, "Segmentation_GT": seg, "Im_segmented":im_seg}
+            
+            #im_seg_1 = np.pad( np.uint8(im_seg) ,2,pad_with ,padder=255)
+            #seg_1 = np.pad( np.uint8(seg) ,2,pad_with ,padder=255)
+            #plt.subplot(1,2,1)
+            #plt.imshow(np.squeeze(seg), cmap=plt.get_cmap('summer'))
+            #axes.get_xaxis().set_visible(False)
+            #axes.get_yaxis().set_visible(False)
 
-            fig1=plt.subplot(1,2,2)
-            fig1=plt.imshow(np.uint8((im_seg)), cmap=plt.get_cmap('summer'))
-            fig1.axes.get_xaxis().set_visible(False)
-            fig1.axes.get_yaxis().set_visible(False)
+            #plt.subplot(1,2,2)
+            #plt.imshow(np.uint8((im_seg)), cmap=plt.get_cmap('summer'))
+            #axes.get_xaxis().set_visible(False)
+            #axes.get_yaxis().set_visible(False)
             #fig1=plt.show()
-            fig1=plt.savefig('./'+featureSpace+'_'+clusteringMethod+'/'+str(i)+'.png')
-
+            #plt.savefig('./'+featureSpace+'_'+clusteringMethod+'/'+str(i)+'.png')
+     
             #plt.imshow(np.squeeze(im_seg), cmap=plt.get_cmap('summer'))
             #plt.show()
+
             print('File to save: '+'./'+featureSpace+'_'+clusteringMethod+'/eval_segIm'+str(i)+'_K'+str(numberOfClusters)+'.pickle')
             with open('./'+featureSpace+'_'+clusteringMethod+'/eval_segIm'+str(i)+'_K'+str(numberOfClusters)+'.pickle', 'wb') as handle:
                 pickle.dump(eval_seg, handle, protocol=pickle.HIGHEST_PROTOCOL)
